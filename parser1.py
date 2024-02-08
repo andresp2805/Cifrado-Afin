@@ -15,5 +15,6 @@ def contar_parentesis(lista):
         return False
     else:
         return True
-contar_parentesis(lista_prueba) 
+contar_parentesis(lista_prueba)
+
 

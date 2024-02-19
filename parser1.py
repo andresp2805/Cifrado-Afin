@@ -1,119 +1,20 @@
+import lexer as lx
 
-COMMAND = ['defvar','=','move','skip','turn','face','put','pick','move-dir','run-dirs','move-face','null']
-for i in range(0,len(COMMAND)):
-    COMMAND[i] = COMMAND[i].lower()
-    
-CONSTANTS = ['Dim','myXpos','myYpos','myChips','myBalloons','balloonsHere','ChipsHere','Spaces']
-for i in range(0,len(CONSTANTS)):
-    CONSTANTS[i] = CONSTANTS[i].lower()
-    
-CONTROL_STRUCTURE = ['if','loop','repeat','defun']
-for i in range(0,len(CONTROL_STRUCTURE)):
-    CONTROL_STRUCTURE[i] = CONTROL_STRUCTURE[i].lower()
-    
-CONDITION = ['facing?','blocked?','can-put?','can-pick?','can-move?','isZero?','not']
-for i in range(0,len(CONDITION)):
-    CONDITION[i] = CONDITION[i].lower()
+lista_prueba = [{'LPAREN': '('}, {'COMMAND': 'defvar'}, {'NAME': 'rotate'}, {'INT: ': '3'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'if'}, {'LPAREN': '('}, {'CONDITION': 'can-move?'}, {'INPUT': ':north'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'move-dir'}, {'INT: ': '1'}, {'INPUT': ':north'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'null'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'if'}, {'LPAREN': '('}, {'CONDITION': 'not'}, {'LPAREN': '('}, {'CONDITION': 'blocked?'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'move'}, {'INT: ': '1'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'null'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'turn'}, {'INPUT': ':left'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'defvar'}, {'NAME': 'one'}, {'INT: ': '1'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'defun'}, {'NAME': 'foo'}, {'LPAREN': '('}, {'PARAMETER': 'c'}, {'PARAMETER': 'p'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'put'}, {'INPUT': ':chips'}, {'PARAMETER': 'c'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'put'}, {'INPUT': ':balloons'}, {'PARAMETER': 'p'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'move'}, {'NAME': 'rotate'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'NAME': 'foo'}, {'INT: ': '1'}, {'INT: ': '3'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'defun'}, {'NAME': 'goend'}, {'LPAREN': '('}, {'RPAREN': ')'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'if'}, {'LPAREN': '('}, {'CONDITION': 'not'}, {'LPAREN': '('}, {'CONDITION': 'blocked?'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'LPAREN': '('}, {'COMMAND': 'move'}, {'NAME': 'one'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'NAME': 'goend'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'null'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'defun'}, {'NAME': 'fill'}, {'LPAREN': '('}, {'RPAREN': ')'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'repeat'}, {'CONSTANTS': 'spaces'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'if'}, {'LPAREN': '('}, {'CONDITION': 'not'}, {'LPAREN': '('}, {'CONDITION': 'iszero?'}, {'CONSTANTS': 'mychips'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'put'}, {'INPUT': ':chips'}, {'INT: ': '1'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'CONTROL_STRUCTURE': 'defun'}, {'NAME': 'pickallb'}, {'LPAREN': '('}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'pick'}, {'INPUT': ':balloons'}, {'CONSTANTS': 'balloonshere'}, {'RPAREN': ')'}, {'RPAREN': ')'}, {'LPAREN': '('}, {'COMMAND': 'run-dirs'}, {'INPUT': ':left'}, {'STR': ':up'}, {'INPUT': ':left'}, {'STR': ':down'}, {'INPUT': ':right'}, {'RPAREN': ')'}]
 
-D = [':left', ':right', ':around', ':north', ':south', ':east', ':west', ':balloons', ':chips', ':front', ':back']
+def contar_parentesis(lista):
+    derecho = 0
+    izquierdo = 0
+    for j in lista:
+        for i in j.values():
+            if i == '(':
+                izquierdo += 1
+            elif i == ')':
+                derecho += 1
+    if derecho != izquierdo:
+        return False
+    else:
+        return True
 
-def leer_archivo(file_path):
-    with open(file_path, 'r') as file:
-        contenido = file.read()
-    return contenido
 
-def procesar_codigo(codigo):
-    codigo = ' '.join(codigo.split())
-    codigo = codigo.replace('\n', ' ')
-    codigo = codigo.replace(': ', ':')
-    codigo = codigo.replace('. ', '.')
-    codigo = codigo.replace(' .', '.')
-    return codigo.lower()
-
-def obtener_lista_tokens(contenido):
-    contenido = contenido.replace('(', ' ( ').replace(')', ' ) ')
-    tokens = contenido.split()
-    return tokens
-
-def crear_tokens(lista_tokens):
-    lista = []
-    lista2 = []
-    lista3 = []
-    for i in range(0,len(lista_tokens)):
-        if lista_tokens[i] == '(':
-            lista.append({'LPAREN' : '('})
-        elif lista_tokens[i] == ')':
-            lista.append({'RPAREN' : ')'})
-        elif lista_tokens[i] in COMMAND:
-            lista.append({'COMMAND' : lista_tokens[i]})
-        elif lista_tokens[i] in CONSTANTS:
-            lista.append({'CONSTANTS' : lista_tokens[i]})
-        elif lista_tokens[i] in CONTROL_STRUCTURE:
-            lista.append({'CONTROL_STRUCTURE' : lista_tokens[i]})
-        elif lista_tokens[i] in CONDITION:
-            lista.append({'CONDITION' : lista_tokens[i]})
-        elif lista_tokens[i] in D:
-            lista.append({'INPUT' : lista_tokens[i]})
-        elif is_a_number(lista_tokens[i]) == int:
-            lista.append({'INT: ' : lista_tokens[i]})
-        elif is_a_number(lista_tokens[i]) == float:
-            lista.append({'FLOAT' : lista_tokens[i]})
-        elif lista_tokens[i-1] == 'defun' or lista_tokens[i-1] == '=' or lista_tokens[i-1] == 'defvar':
-            lista.append({'NAME' : lista_tokens[i]})
-            lista2.append(lista_tokens[i])
-        elif lista_tokens[i] in lista2:
-            lista.append({'NAME' : lista_tokens[i]})
-        elif lista_tokens[i-3] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-4] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-5] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-6] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-7] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-8] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-9] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-10] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-11] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i-12] == 'defun':
-            lista.append({'PARAMETER' : lista_tokens[i]})
-            lista3.append(lista_tokens[i])
-        elif lista_tokens[i] in lista3:
-            lista.append({'PARAMETER' : lista_tokens[i]})
-        else:
-            lista.append({'STR' : lista_tokens[i]})
-    return lista
-
-def is_a_number(s):
-    try:
-        int_value = int(s)
-        return int
-    except ValueError:
-        try:
-            float_value = float(s)
-            return float
-        except ValueError:
-            return str
-        
-content = leer_archivo('texto.txt')
-arreglo = procesar_codigo(content)
-result = obtener_lista_tokens(arreglo)
-tokens = crear_tokens(result)
-
-for i in tokens:
-    print(i)
+contar_parentesis(lista_prueba) 

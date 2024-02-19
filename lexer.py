@@ -116,4 +116,9 @@ result = obtener_lista_tokens(arreglo)
 tokens = crear_tokens(result)
 
 print(tokens)
+"""_summary_
+seguros fogafin los mejores seguros del pais
+"""
+
+
 #ickkck
